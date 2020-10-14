@@ -4,6 +4,8 @@
 // 4. Draw Stones
 // 5. Mouse Click
 // 6. Apply Textures
+// 7. Capture Stone
+
 
 
 /***************************************************************************************/
@@ -17,11 +19,40 @@ using namespace sf;
 
 
 /***************************************************************************************/
+bool visit[19][19];
+
 int cell_size = 40;
 int board[19][19] = { 0 };
 #define BLACK (1)
 #define WHITE (2)
 
+
+
+/***************************************************************************************/
+bool live_check(int color, int x, int y)
+{
+	if (visit[y][x])
+		return false;			// to remove cycle
+
+	visit[y][x] = true;
+
+	if (board[y][x] == 0)
+	{
+		return true;			// empty space means the dragon is alive
+	}
+
+	if (board[y][x] != color)
+		return false;			// captured by enemy stone
+
+	// recursive search
+	bool 
+	r = x > 0 && live_check(color, x - 1, y);
+	r |= x < 19 - 1 && live_check(color, x + 1, y);
+	r |= x > 0 && live_check(color, x, y - 1);
+	r |= y < 19 - 1 && live_check(color, x, y + 1);
+	
+	return r;
+}
 
 /***************************************************************************************/
 int main()
@@ -39,15 +70,44 @@ int main()
 	bt.loadFromFile("black_stone.bmp");
 	wt.loadFromFile("white_stone.bmp");
 
+	// Apply Smoothness for Black Stone
 	bt.setSmooth(true);
+	// Apply Smoothness for White Stone
 	wt.setSmooth(true);
 	
+	// Apply texture for Black Stone
 	Sprite bs(bt);
+	// Apply texture for White Stone
 	Sprite ws(wt);
 
-	bs.setScale(1.0 * cell_size / bs.getLocalBounds().width, 1.0 * cell_size / bs.getLocalBounds().height);
-	ws.setScale(1.0 * cell_size / ws.getLocalBounds().width, 1.0 * cell_size / ws.getLocalBounds().height);
+	bs.setScale(cell_size / bs.getLocalBounds().width,  cell_size / bs.getLocalBounds().height);
+	ws.setScale(cell_size / ws.getLocalBounds().width,  cell_size / ws.getLocalBounds().height);
 
+	auto remove_dead_stone = [&](int color)
+	{
+		int capture[19][19] = { 0 };
+
+		for (int y = 0; y < 19; y++)
+			for (int x = 0; x < 19; x++)
+			{
+				if (board[y][x] != color)
+					continue;
+
+				for (int i = 0; i < 19; i++)
+					for (int j = 0; j < 19; j++)
+						visit[i][j] = false;
+
+				if (live_check(color, x, y) == false)
+					capture[y][x] = 1;
+			}
+
+		for (int y = 0; y < 19; y++)
+			for (int x = 0; x < 19; x++)
+			{
+				if (capture[y][x])
+					board[y][x] = 0;
+			}
+	};
 
 	while (window.isOpen())
 	{
@@ -66,11 +126,14 @@ int main()
 				if (e.mouseButton.button == Mouse::Left)
 				{
 					board[ix][iy] = BLACK;
+					remove_dead_stone(WHITE);
 				}
 				// Put White Stone with right click
 				else if (e.mouseButton.button == Mouse::Right)
 				{
 					board[ix][iy] = WHITE;
+					remove_dead_stone(BLACK);
+
 				}
 			}
 		}
