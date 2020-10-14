@@ -1,6 +1,7 @@
 ﻿// 1. Create Game Window
 // 2. Draw Board
 // 3. Draw Start Points
+// 4. Draw Stones
 
 
 /***************************************************************************************/
@@ -80,7 +81,29 @@ int main()
 				}
 
 		};
+
+
 		draw_board();
+
+		// Draw stone
+		auto draw_stone = [&]()
+		{
+			CircleShape stone(cell_size / 2.0);
+			stone.setFillColor(Color::White);
+			stone.setOutlineColor(Color::Black);
+			stone.setOutlineThickness(-2); // inner grow
+			stone.setPosition(0, 0);
+
+			window.draw(stone);
+
+			stone.setFillColor(Color::Black);
+			stone.setPosition(0, cell_size);
+
+			window.draw(stone);
+
+		};
+
+		draw_stone();
 
 		window.display();
 	}
