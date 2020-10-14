@@ -2,6 +2,7 @@
 // 2. Draw Board
 // 3. Draw Start Points
 // 4. Draw Stones
+//
 
 
 /***************************************************************************************/
@@ -20,7 +21,10 @@ int cell_size = 40;
 /***************************************************************************************/
 int main()
 {
-    RenderWindow window(VideoMode(cell_size * 19, cell_size * 19), "Go");
+	ContextSettings s;
+	s.antialiasingLevel = 8;
+
+	RenderWindow window(VideoMode(cell_size * 19, cell_size * 19), "Go", Style::Default, s);
 	while (window.isOpen())
 	{
 		Event e;
