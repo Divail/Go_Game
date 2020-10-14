@@ -2,7 +2,7 @@
 // 2. Draw Board
 // 3. Draw Start Points
 // 4. Draw Stones
-//
+// 5. Mouse Click
 
 
 /***************************************************************************************/
@@ -17,6 +17,10 @@ using namespace sf;
 
 /***************************************************************************************/
 int cell_size = 40;
+int board[19][19] = { 0 };
+#define BLACK (1)
+#define WHITE (2)
+
 
 /***************************************************************************************/
 int main()
@@ -25,6 +29,16 @@ int main()
 	s.antialiasingLevel = 8;
 
 	RenderWindow window(VideoMode(cell_size * 19, cell_size * 19), "Go", Style::Default, s);
+
+	CircleShape bs(cell_size / 2.0);
+	CircleShape ws(cell_size / 2.0);
+	bs.setFillColor(Color::Black);
+	bs.setOutlineColor(Color::Black);
+
+	ws.setFillColor(Color::White);
+	ws.setOutlineColor(Color::Black);
+	ws.setOutlineThickness(-2); // inner grow
+
 	while (window.isOpen())
 	{
 		Event e;
@@ -32,6 +46,23 @@ int main()
 		{
 			if (e.type == Event::Closed)
 				window.close();
+			if (e.type == Event::MouseButtonPressed)
+			{
+
+				int ix = e.mouseButton.x / cell_size;
+				int iy = e.mouseButton.y / cell_size;
+
+				// Put Black Stone with left click
+				if (e.mouseButton.button == Mouse::Left)
+				{
+					board[ix][iy] = BLACK;
+				}
+				// Put White Stone with right click
+				else if (e.mouseButton.button == Mouse::Right)
+				{
+					board[ix][iy] = WHITE;
+				}
+			}
 		}
 		window.clear(Color::Yellow);
 
@@ -92,18 +123,20 @@ int main()
 		// Draw stone
 		auto draw_stone = [&]()
 		{
-			CircleShape stone(cell_size / 2.0);
-			stone.setFillColor(Color::White);
-			stone.setOutlineColor(Color::Black);
-			stone.setOutlineThickness(-2); // inner grow
-			stone.setPosition(0, 0);
-
-			window.draw(stone);
-
-			stone.setFillColor(Color::Black);
-			stone.setPosition(0, cell_size);
-
-			window.draw(stone);
+			for (int y = 0; y < 19; y++)
+				for (int x = 0; x < 19; x++)
+				{
+					if (board[x][y] == BLACK)
+					{
+						bs.setPosition(x * cell_size, y * cell_size);
+						window.draw(bs);
+					}
+					else if (board[x][y] == WHITE)
+					{
+						ws.setPosition(x * cell_size, y * cell_size);
+						window.draw(ws);
+					}
+				}
 
 		};
 
