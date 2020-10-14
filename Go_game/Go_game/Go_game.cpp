@@ -3,6 +3,7 @@
 // 3. Draw Start Points
 // 4. Draw Stones
 // 5. Mouse Click
+// 6. Apply Textures
 
 
 /***************************************************************************************/
@@ -30,14 +31,23 @@ int main()
 
 	RenderWindow window(VideoMode(cell_size * 19, cell_size * 19), "Go", Style::Default, s);
 
-	CircleShape bs(cell_size / 2.0);
-	CircleShape ws(cell_size / 2.0);
-	bs.setFillColor(Color::Black);
-	bs.setOutlineColor(Color::Black);
+	// Black Stone
+	Texture bt;
+	// White Stone
+	Texture wt;
 
-	ws.setFillColor(Color::White);
-	ws.setOutlineColor(Color::Black);
-	ws.setOutlineThickness(-2); // inner grow
+	bt.loadFromFile("black_stone.bmp");
+	wt.loadFromFile("white_stone.bmp");
+
+	bt.setSmooth(true);
+	wt.setSmooth(true);
+	
+	Sprite bs(bt);
+	Sprite ws(wt);
+
+	bs.setScale(1.0 * cell_size / bs.getLocalBounds().width, 1.0 * cell_size / bs.getLocalBounds().height);
+	ws.setScale(1.0 * cell_size / ws.getLocalBounds().width, 1.0 * cell_size / ws.getLocalBounds().height);
+
 
 	while (window.isOpen())
 	{
