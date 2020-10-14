@@ -74,7 +74,7 @@ int main()
 				}
 			}
 		}
-		window.clear(Color::Yellow);
+		window.clear(Color(255, 207, 97));
 
 
 		// Draw lines
