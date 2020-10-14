@@ -1,5 +1,6 @@
-﻿//1. Create Game Window
-//2. Draw Board
+﻿// 1. Create Game Window
+// 2. Draw Board
+// 3. Draw Start Points
 
 
 /***************************************************************************************/
@@ -28,11 +29,14 @@ int main()
 				window.close();
 		}
 		window.clear(Color::Yellow);
+
+
+		// Draw lines
 		auto draw_board = [&]()
 		{
 			float half_cell = cell_size / 2.0;
 
-			//Draw horizontal lines
+			// Draw horizontal lines
 			for (int y = 0; y < 19; y++)
 			{
 				Vertex hline[] =
@@ -47,7 +51,7 @@ int main()
 				window.draw(hline, 2, Lines);
 			}
 
-			//Draw vertical lines
+			// Draw vertical lines
 			for (int x = 0; x < 19; x++)
 			{
 				Vertex vline[] =
@@ -61,8 +65,23 @@ int main()
 
 				window.draw(vline, 2, Lines);
 			}
+
+
+			// Draw Start Points
+			float start_point_r = half_cell / 5;
+			CircleShape circle( start_point_r );
+			circle.setFillColor( Color::Black );
+			for (int y = 0; y < 3; y++)
+				for (int x = 0; x < 3; x++)
+				{
+					circle.setPosition(half_cell + (3 + 6 * x) * cell_size - start_point_r,
+						half_cell + (3 + 6 * y) * cell_size - start_point_r);
+					window.draw(circle);
+				}
+
 		};
 		draw_board();
+
 		window.display();
 	}
 	return 0;
