@@ -5,12 +5,14 @@
 // 5. Mouse Click
 // 6. Apply Textures
 // 7. Capture Stone
-
+// 8. AI
 
 
 /***************************************************************************************/
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <Windows.h>
+#include <assert.h>
 
 
 /***************************************************************************************/
@@ -26,6 +28,89 @@ int board[19][19] = { 0 };
 #define BLACK (1)
 #define WHITE (2)
 
+
+/***************************************************************************************/
+STARTUPINFO sti = { 0 };
+SECURITY_ATTRIBUTES sats = { 0 };
+PROCESS_INFORMATION pi = { 0 };
+HANDLE pipin_w, pipin_r;
+HANDLE pipout_w, pipout_r;
+BYTE buffer[2048];
+DWORD write, excode, read, avaiable;
+
+
+/***************************************************************************************/
+void ConnectToEngine(const char* path)
+{
+	pipin_w = pipin_r = pipout_w = pipout_r = NULL;
+	sats.nLength = sizeof(sats);
+	sats.bInheritHandle = TRUE;
+	sats.lpSecurityDescriptor = NULL;
+
+	CreatePipe(&pipout_r, &pipout_w, &sats, 0);
+	CreatePipe(&pipin_r, &pipin_w, &sats, 0);
+
+	sti.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+	sti.wShowWindow = SW_HIDE;
+	sti.hStdInput = pipin_r;
+	sti.hStdOutput = pipout_w;
+	sti.hStdError = pipout_w;
+
+	assert(CreateProcess(NULL, (char *)path, NULL, NULL, TRUE, 0, NULL, NULL, &sti, &pi));
+}
+
+
+/***************************************************************************************/
+string getNextMove(string position)
+{
+
+	string str;
+
+	position = "play back " + position + "\ngenmove white\n";
+
+	printf("%s\n", position.c_str());
+
+	WriteFile(pipin_w, position.c_str(), position.length(), &write, NULL);
+	Sleep(500);
+
+	PeekNamedPipe(pipout_r, buffer, sizeof(buffer), &read, &avaiable, NULL);
+
+A:
+	do
+	{
+		ZeroMemory(buffer, sizeof(buffer));
+		if (!ReadFile(pipout_r, buffer, sizeof(buffer), &read, NULL) || !read)
+			break;
+	
+		buffer[read] = 0;
+
+		str += (char*)buffer;
+	} while (read >= sizeof(buffer));
+
+	if (str.length() <= 5)
+		goto A;
+
+	printf("%s\n", str.c_str());
+
+	int n = str.rfind("=");
+	
+	assert(n != string::npos);
+
+	return str.substr(n + 1);
+}
+
+
+/***************************************************************************************/
+void CloseConnection()
+{
+	WriteFile(pipin_w, "quit\n", 5, &write, NULL);
+	if     (pipin_w != NULL) CloseHandle(pipin_w);
+	if     (pipin_r != NULL) CloseHandle(pipin_r);
+	if    (pipout_w != NULL) CloseHandle(pipout_w);
+	if    (pipout_r != NULL) CloseHandle(pipout_r);
+	if (pi.hProcess != NULL) CloseHandle(pi.hProcess);
+	if  (pi.hThread != NULL) CloseHandle(pi.hThread);
+}
 
 
 /***************************************************************************************/
@@ -54,9 +139,12 @@ bool live_check(int color, int x, int y)
 	return r;
 }
 
+
 /***************************************************************************************/
 int main()
 {
+	ConnectToEngine("gnugo.exe --mode gtp");
+
 	ContextSettings s;
 	s.antialiasingLevel = 8;
 
@@ -109,36 +197,9 @@ int main()
 			}
 	};
 
-	while (window.isOpen())
+	auto update = [&]()
 	{
-		Event e;
-		while (window.pollEvent(e))
-		{
-			if (e.type == Event::Closed)
-				window.close();
-			if (e.type == Event::MouseButtonPressed)
-			{
-
-				int ix = e.mouseButton.x / cell_size;
-				int iy = e.mouseButton.y / cell_size;
-
-				// Put Black Stone with left click
-				if (e.mouseButton.button == Mouse::Left)
-				{
-					board[ix][iy] = BLACK;
-					remove_dead_stone(WHITE);
-				}
-				// Put White Stone with right click
-				else if (e.mouseButton.button == Mouse::Right)
-				{
-					board[ix][iy] = WHITE;
-					remove_dead_stone(BLACK);
-
-				}
-			}
-		}
 		window.clear(Color(255, 207, 97));
-
 
 		// Draw lines
 		auto draw_board = [&]()
@@ -150,13 +211,13 @@ int main()
 			{
 				Vertex hline[] =
 				{
-					Vertex( Vector2f( half_cell, half_cell + y * cell_size ) ),
-					Vertex( Vector2f( cell_size * 19 - half_cell, half_cell + y * cell_size ) )
+					Vertex(Vector2f(half_cell, half_cell + y * cell_size)),
+					Vertex(Vector2f(cell_size * 19 - half_cell, half_cell + y * cell_size))
 				};
 
 				hline[0].color = Color::Black;
 				hline[1].color = Color::Black;
-				
+
 				window.draw(hline, 2, Lines);
 			}
 
@@ -164,9 +225,9 @@ int main()
 			for (int x = 0; x < 19; x++)
 			{
 				Vertex vline[] =
-				{				
-					Vertex( Vector2f( half_cell + x * cell_size, half_cell ) ),
-					Vertex( Vector2f( half_cell + x * cell_size, cell_size * 19 - half_cell ) )
+				{
+					Vertex(Vector2f(half_cell + x * cell_size, half_cell)),
+					Vertex(Vector2f(half_cell + x * cell_size, cell_size * 19 - half_cell))
 				};
 
 				vline[0].color = Color::Black;
@@ -178,8 +239,8 @@ int main()
 
 			// Draw Start Points
 			float start_point_r = half_cell / 5;
-			CircleShape circle( start_point_r );
-			circle.setFillColor( Color::Black );
+			CircleShape circle(start_point_r);
+			circle.setFillColor(Color::Black);
 			for (int y = 0; y < 3; y++)
 				for (int x = 0; x < 3; x++)
 				{
@@ -187,7 +248,6 @@ int main()
 						half_cell + (3 + 6 * y) * cell_size - start_point_r);
 					window.draw(circle);
 				}
-
 		};
 
 
@@ -216,6 +276,45 @@ int main()
 		draw_stone();
 
 		window.display();
+	};
+
+	while (window.isOpen())
+	{
+		Event e;
+		while (window.pollEvent(e))
+		{
+			if (e.type == Event::Closed)
+				window.close();
+			if (e.type == Event::MouseButtonPressed)
+			{
+
+				int ix = e.mouseButton.x / cell_size;
+				int iy = e.mouseButton.y / cell_size;
+
+				// Put Black Stone with left click
+				if (e.mouseButton.button == Mouse::Left)
+				{
+					board[ix][iy] = BLACK;
+					remove_dead_stone(WHITE);
+					update();
+
+					// AI
+					char move[10] = { 0 };
+					ix += 'A';
+					if (ix >= 'I') ix += 1;
+					sprintf(move, "%c%d", ix, iy + 1);
+					string ret = getNextMove(move);
+					assert(ret.length() >= 4);
+					sscanf(ret.c_str(), " %c%d\r\n\r\n", &ix, &iy);
+					if (ix >= 'J') ix--;
+					ix -= 'A';
+					board[iy - 1][ix] = WHITE;  // AI will play white stones!
+					remove_dead_stone(BLACK);
+					update();
+				}
+			}
+		}
+		update();
 	}
 	return 0;
 }
