@@ -66,7 +66,7 @@ string getNextMove(string position)
 
 	string str;
 
-	position = "play back " + position + "\ngenmove white\n";
+	position = "play black " + position + "\ngenmove white\n";
 
 	printf("%s\n", position.c_str());
 
