@@ -94,7 +94,6 @@ A:
 
 	int n = str.rfind("=");
 	
-	assert(n != string::npos);
 
 	return str.substr(n + 1);
 }
@@ -294,23 +293,30 @@ int main()
 				// Put Black Stone with left click
 				if (e.mouseButton.button == Mouse::Left)
 				{
-					board[ix][iy] = BLACK;
-					remove_dead_stone(WHITE);
-					update();
+					if (board[ix][iy] != BLACK && board[ix][iy] != WHITE)
+					{
+						board[ix][iy] = BLACK;
+						remove_dead_stone(WHITE);
+						update();
 
-					// AI
-					char move[10] = { 0 };
-					ix += 'A';
-					if (ix >= 'I') ix += 1;
-					sprintf(move, "%c%d", ix, iy + 1);
-					string ret = getNextMove(move);
-					assert(ret.length() >= 4);
-					sscanf(ret.c_str(), " %c%d\r\n\r\n", &ix, &iy);
-					if (ix >= 'J') ix--;
-					ix -= 'A';
-					board[iy - 1][ix] = WHITE;  // AI will play white stones!
-					remove_dead_stone(BLACK);
-					update();
+						
+						// AI
+						char move[10] = { 0 };
+						ix += 'A';
+						if (ix >= 'I') ix += 1;
+						sprintf(move, "%c%d", ix, iy + 1);
+						string ret = getNextMove(move);
+						sscanf(ret.c_str(), " %c%d\r\n\r\n", &ix, &iy);
+						if (ix >= 'J') ix--;
+						ix -= 'A';
+						board[iy - 1][ix] = WHITE;  // AI will play white stones!
+						remove_dead_stone(BLACK);
+						update();
+						
+					}
+					
+					
+					
 				}
 			}
 		}
