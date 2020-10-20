@@ -139,6 +139,7 @@ bool live_check(int color, int x, int y)
 }
 
 
+/***************************************************************************************/
 void remove_dead_stone(int color)
 {
 	int capture[19][19] = { 0 };
@@ -164,6 +165,96 @@ void remove_dead_stone(int color)
 				board[y][x] = 0;
 		}
 };
+
+
+/***************************************************************************************/
+// Draw lines
+void draw_board(RenderWindow& window)
+{
+	float half_cell = cell_size / 2.0;
+
+	// Draw horizontal lines
+	for (int y = 0; y < 19; y++)
+	{
+		Vertex hline[] =
+		{
+			Vertex(Vector2f(half_cell, half_cell + y * cell_size)),
+			Vertex(Vector2f(cell_size * 19 - half_cell, half_cell + y * cell_size))
+		};
+
+		hline[0].color = Color::Black;
+		hline[1].color = Color::Black;
+
+		window.draw(hline, 2, Lines);
+	}
+
+	// Draw vertical lines
+	for (int x = 0; x < 19; x++)
+	{
+		Vertex vline[] =
+		{
+			Vertex(Vector2f(half_cell + x * cell_size, half_cell)),
+			Vertex(Vector2f(half_cell + x * cell_size, cell_size * 19 - half_cell))
+		};
+
+		vline[0].color = Color::Black;
+		vline[1].color = Color::Black;
+
+		window.draw(vline, 2, Lines);
+	}
+
+
+	// Draw Start Points
+	float start_point_r = half_cell / 5;
+
+	CircleShape circle(start_point_r);
+	circle.setFillColor(Color::Black);
+
+	for (int y = 0; y < 3; y++)
+		for (int x = 0; x < 3; x++)
+		{
+			circle.setPosition(half_cell + (3 + 6 * x) * cell_size - start_point_r,
+				half_cell + (3 + 6 * y) * cell_size - start_point_r);
+
+			window.draw(circle);
+		}
+};
+
+
+/***************************************************************************************/
+void draw_stone(Sprite bs, Sprite ws, RenderWindow& window)
+{
+	for (int y = 0; y < 19; y++)
+		for (int x = 0; x < 19; x++)
+		{
+			if (board[x][y] == BLACK)
+			{
+				bs.setPosition(x * cell_size, y * cell_size);
+				window.draw(bs);
+			}
+			else if (board[x][y] == WHITE)
+			{
+				ws.setPosition(x * cell_size, y * cell_size);
+				window.draw(ws);
+			}
+		}
+
+};
+
+
+/***************************************************************************************/
+void update(Sprite bs, Sprite ws, RenderWindow& window)
+{
+	window.clear(Color(255, 207, 97));
+
+	draw_board(window);
+
+	// Draw stone
+	draw_stone(bs, ws, window);
+
+	window.display();
+};
+
 
 /***************************************************************************************/
 int main()
@@ -196,89 +287,7 @@ int main()
 	bs.setScale(cell_size / bs.getLocalBounds().width, cell_size / bs.getLocalBounds().height);
 	ws.setScale(cell_size / ws.getLocalBounds().width, cell_size / ws.getLocalBounds().height);
 
-	auto update = [&]()
-	{
-		window.clear(Color(255, 207, 97));
-
-		// Draw lines
-		auto draw_board = [&]()
-		{
-			float half_cell = cell_size / 2.0;
-
-			// Draw horizontal lines
-			for (int y = 0; y < 19; y++)
-			{
-				Vertex hline[] =
-				{
-					Vertex(Vector2f(half_cell, half_cell + y * cell_size)),
-					Vertex(Vector2f(cell_size * 19 - half_cell, half_cell + y * cell_size))
-				};
-
-				hline[0].color = Color::Black;
-				hline[1].color = Color::Black;
-
-				window.draw(hline, 2, Lines);
-			}
-
-			// Draw vertical lines
-			for (int x = 0; x < 19; x++)
-			{
-				Vertex vline[] =
-				{
-					Vertex(Vector2f(half_cell + x * cell_size, half_cell)),
-					Vertex(Vector2f(half_cell + x * cell_size, cell_size * 19 - half_cell))
-				};
-
-				vline[0].color = Color::Black;
-				vline[1].color = Color::Black;
-
-				window.draw(vline, 2, Lines);
-			}
-
-
-			// Draw Start Points
-			float start_point_r = half_cell / 5;
-
-			CircleShape circle(start_point_r);
-			circle.setFillColor(Color::Black);
-
-			for (int y = 0; y < 3; y++)
-				for (int x = 0; x < 3; x++)
-				{
-					circle.setPosition(half_cell + (3 + 6 * x) * cell_size - start_point_r,
-						half_cell + (3 + 6 * y) * cell_size - start_point_r);
-
-					window.draw(circle);
-				}
-		};
-
-
-		draw_board();
-
-		// Draw stone
-		auto draw_stone = [&]()
-		{
-			for (int y = 0; y < 19; y++)
-				for (int x = 0; x < 19; x++)
-				{
-					if (board[x][y] == BLACK)
-					{
-						bs.setPosition(x * cell_size, y * cell_size);
-						window.draw(bs);
-					}
-					else if (board[x][y] == WHITE)
-					{
-						ws.setPosition(x * cell_size, y * cell_size);
-						window.draw(ws);
-					}
-				}
-
-		};
-
-		draw_stone();
-
-		window.display();
-	};
+	update(bs, ws, window);
 
 	while (window.isOpen())
 	{
@@ -300,7 +309,7 @@ int main()
 					{
 						board[ix][iy] = BLACK;
 						remove_dead_stone(WHITE);
-						update();
+						update(bs, ws, window);
 
 
 						// AI
@@ -314,7 +323,7 @@ int main()
 						ix -= 'A';
 						board[iy - 1][ix] = WHITE;  // AI will play white stones!
 						remove_dead_stone(BLACK);
-						update();
+						update(bs, ws, window);
 
 					}
 
@@ -323,7 +332,7 @@ int main()
 				}
 			}
 		}
-		update();
+		update(bs, ws, window);
 	}
 	return 0;
 }
