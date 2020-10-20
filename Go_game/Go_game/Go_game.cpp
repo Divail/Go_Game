@@ -56,7 +56,7 @@ void ConnectToEngine(const char* path)
 	sti.hStdOutput = pipout_w;
 	sti.hStdError = pipout_w;
 
-	assert(CreateProcess(NULL, (char *)path, NULL, NULL, TRUE, 0, NULL, NULL, &sti, &pi));
+	assert(CreateProcess(NULL, (char*)path, NULL, NULL, TRUE, 0, NULL, NULL, &sti, &pi));
 }
 
 
@@ -81,7 +81,7 @@ A:
 		ZeroMemory(buffer, sizeof(buffer));
 		if (!ReadFile(pipout_r, buffer, sizeof(buffer), &read, NULL) || !read)
 			break;
-	
+
 		buffer[read] = 0;
 
 		str += (char*)buffer;
@@ -93,7 +93,7 @@ A:
 	printf("%s\n", str.c_str());
 
 	int n = str.rfind("=");
-	
+
 
 	return str.substr(n + 1);
 }
@@ -103,12 +103,12 @@ A:
 void CloseConnection()
 {
 	WriteFile(pipin_w, "quit\n", 5, &write, NULL);
-	if     (pipin_w != NULL) CloseHandle(pipin_w);
-	if     (pipin_r != NULL) CloseHandle(pipin_r);
-	if    (pipout_w != NULL) CloseHandle(pipout_w);
-	if    (pipout_r != NULL) CloseHandle(pipout_r);
+	if (pipin_w != NULL) CloseHandle(pipin_w);
+	if (pipin_r != NULL) CloseHandle(pipin_r);
+	if (pipout_w != NULL) CloseHandle(pipout_w);
+	if (pipout_r != NULL) CloseHandle(pipout_r);
 	if (pi.hProcess != NULL) CloseHandle(pi.hProcess);
-	if  (pi.hThread != NULL) CloseHandle(pi.hThread);
+	if (pi.hThread != NULL) CloseHandle(pi.hThread);
 }
 
 
@@ -129,15 +129,41 @@ bool live_check(int color, int x, int y)
 		return false;			// captured by enemy stone
 
 	// recursive search
-	bool 
-	r = x > 0 && live_check(color, x - 1, y);
+	bool
+		r = x > 0 && live_check(color, x - 1, y);
 	r |= x < 19 - 1 && live_check(color, x + 1, y);
 	r |= x > 0 && live_check(color, x, y - 1);
 	r |= y < 19 - 1 && live_check(color, x, y + 1);
-	
+
 	return r;
 }
 
+
+void remove_dead_stone(int color)
+{
+	int capture[19][19] = { 0 };
+
+	for (int y = 0; y < 19; y++)
+		for (int x = 0; x < 19; x++)
+		{
+			if (board[y][x] != color)
+				continue;
+
+			for (int i = 0; i < 19; i++)
+				for (int j = 0; j < 19; j++)
+					visit[i][j] = false;
+
+			if (live_check(color, x, y) == false)
+				capture[y][x] = 1;
+		}
+
+	for (int y = 0; y < 19; y++)
+		for (int x = 0; x < 19; x++)
+		{
+			if (capture[y][x])
+				board[y][x] = 0;
+		}
+};
 
 /***************************************************************************************/
 int main()
@@ -161,40 +187,14 @@ int main()
 	bt.setSmooth(true);
 	// Apply Smoothness for White Stone
 	wt.setSmooth(true);
-	
+
 	// Apply texture for Black Stone
 	Sprite bs(bt);
 	// Apply texture for White Stone
 	Sprite ws(wt);
 
-	bs.setScale(cell_size / bs.getLocalBounds().width,  cell_size / bs.getLocalBounds().height);
-	ws.setScale(cell_size / ws.getLocalBounds().width,  cell_size / ws.getLocalBounds().height);
-
-	auto remove_dead_stone = [&](int color)
-	{
-		int capture[19][19] = { 0 };
-
-		for (int y = 0; y < 19; y++)
-			for (int x = 0; x < 19; x++)
-			{
-				if (board[y][x] != color)
-					continue;
-
-				for (int i = 0; i < 19; i++)
-					for (int j = 0; j < 19; j++)
-						visit[i][j] = false;
-
-				if (live_check(color, x, y) == false)
-					capture[y][x] = 1;
-			}
-
-		for (int y = 0; y < 19; y++)
-			for (int x = 0; x < 19; x++)
-			{
-				if (capture[y][x])
-					board[y][x] = 0;
-			}
-	};
+	bs.setScale(cell_size / bs.getLocalBounds().width, cell_size / bs.getLocalBounds().height);
+	ws.setScale(cell_size / ws.getLocalBounds().width, cell_size / ws.getLocalBounds().height);
 
 	auto update = [&]()
 	{
@@ -238,13 +238,16 @@ int main()
 
 			// Draw Start Points
 			float start_point_r = half_cell / 5;
+
 			CircleShape circle(start_point_r);
 			circle.setFillColor(Color::Black);
+
 			for (int y = 0; y < 3; y++)
 				for (int x = 0; x < 3; x++)
 				{
 					circle.setPosition(half_cell + (3 + 6 * x) * cell_size - start_point_r,
 						half_cell + (3 + 6 * y) * cell_size - start_point_r);
+
 					window.draw(circle);
 				}
 		};
@@ -299,7 +302,7 @@ int main()
 						remove_dead_stone(WHITE);
 						update();
 
-						
+
 						// AI
 						char move[10] = { 0 };
 						ix += 'A';
@@ -312,11 +315,11 @@ int main()
 						board[iy - 1][ix] = WHITE;  // AI will play white stones!
 						remove_dead_stone(BLACK);
 						update();
-						
+
 					}
-					
-					
-					
+
+
+
 				}
 			}
 		}
