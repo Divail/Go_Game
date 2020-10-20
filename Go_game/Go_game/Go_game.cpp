@@ -222,7 +222,7 @@ void draw_board(RenderWindow& window)
 
 
 /***************************************************************************************/
-void draw_stone(Sprite bs, Sprite ws, RenderWindow& window)
+void draw_stone(Sprite& bs, Sprite& ws, RenderWindow& window)
 {
 	for (int y = 0; y < 19; y++)
 		for (int x = 0; x < 19; x++)
@@ -243,7 +243,7 @@ void draw_stone(Sprite bs, Sprite ws, RenderWindow& window)
 
 
 /***************************************************************************************/
-void update(Sprite bs, Sprite ws, RenderWindow& window)
+void update(Sprite& bs, Sprite& ws, RenderWindow& window)
 {
 	window.clear(Color(255, 207, 97));
 
@@ -254,6 +254,66 @@ void update(Sprite bs, Sprite ws, RenderWindow& window)
 
 	window.display();
 };
+
+
+/***************************************************************************************/
+void MousePressEvent(Sprite& bs, Sprite& ws, RenderWindow& window, Event e)
+{
+	if (e.type == Event::MouseButtonPressed)
+	{
+
+		int ix = e.mouseButton.x / cell_size;
+		int iy = e.mouseButton.y / cell_size;
+
+		// Put Black Stone with left click
+		if (e.mouseButton.button == Mouse::Left)
+		{
+			if (board[ix][iy] != BLACK && board[ix][iy] != WHITE)
+			{
+				board[ix][iy] = BLACK;
+				remove_dead_stone(WHITE);
+				update(bs, ws, window);
+
+
+				// AI
+				char move[10] = { 0 };
+				ix += 'A';
+				if (ix >= 'I') ix += 1;
+				sprintf(move, "%c%d", ix, iy + 1);
+				string ret = getNextMove(move);
+				sscanf(ret.c_str(), " %c%d\r\n\r\n", &ix, &iy);
+				if (ix >= 'J') ix--;
+				ix -= 'A';
+				board[iy - 1][ix] = WHITE;  // AI will play white stones!
+				remove_dead_stone(BLACK);
+				update(bs, ws, window);
+
+			}
+
+
+
+		}
+	}
+}
+
+
+/***************************************************************************************/
+void WindowIsOpen(Sprite& bs, Sprite& ws, RenderWindow& window)
+{
+	while (window.isOpen())
+	{
+		Event e;
+		while (window.pollEvent(e))
+		{
+			if (e.type == Event::Closed)
+				window.close();
+
+			MousePressEvent(bs, ws, window, e);
+			
+		}
+		update(bs, ws, window);
+	}
+}
 
 
 /***************************************************************************************/
@@ -289,50 +349,7 @@ int main()
 
 	update(bs, ws, window);
 
-	while (window.isOpen())
-	{
-		Event e;
-		while (window.pollEvent(e))
-		{
-			if (e.type == Event::Closed)
-				window.close();
-			if (e.type == Event::MouseButtonPressed)
-			{
+	WindowIsOpen(bs, ws, window);
 
-				int ix = e.mouseButton.x / cell_size;
-				int iy = e.mouseButton.y / cell_size;
-
-				// Put Black Stone with left click
-				if (e.mouseButton.button == Mouse::Left)
-				{
-					if (board[ix][iy] != BLACK && board[ix][iy] != WHITE)
-					{
-						board[ix][iy] = BLACK;
-						remove_dead_stone(WHITE);
-						update(bs, ws, window);
-
-
-						// AI
-						char move[10] = { 0 };
-						ix += 'A';
-						if (ix >= 'I') ix += 1;
-						sprintf(move, "%c%d", ix, iy + 1);
-						string ret = getNextMove(move);
-						sscanf(ret.c_str(), " %c%d\r\n\r\n", &ix, &iy);
-						if (ix >= 'J') ix--;
-						ix -= 'A';
-						board[iy - 1][ix] = WHITE;  // AI will play white stones!
-						remove_dead_stone(BLACK);
-						update(bs, ws, window);
-
-					}
-
-
-
-				}
-			}
-		}
-		update(bs, ws, window);
-	}
 	return 0;
 }
