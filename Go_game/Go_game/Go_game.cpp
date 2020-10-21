@@ -327,23 +327,18 @@ int main()
 
 	Game R(s);
 
-	// Black Stone
-	Texture bt;
-	// White Stone
-	Texture wt;
-
-	bt.loadFromFile("black_stone.bmp");
-	wt.loadFromFile("white_stone.bmp");
+	R.get_bt().loadFromFile("black_stone.bmp");
+	R.get_wt().loadFromFile("white_stone.bmp");
 
 	// Apply Smoothness for Black Stone
-	bt.setSmooth(true);
+	R.get_bt().setSmooth(true);
 	// Apply Smoothness for White Stone
-	wt.setSmooth(true);
+	R.get_wt().setSmooth(true);
 
 	// Apply texture for Black Stone
-	Sprite bs(bt);
+	Sprite bs(R.get_bt());
 	// Apply texture for White Stone
-	Sprite ws(wt);
+	Sprite ws(R.get_wt());
 
 	bs.setScale(cell_size / bs.getLocalBounds().width, cell_size / bs.getLocalBounds().height);
 	ws.setScale(cell_size / ws.getLocalBounds().width, cell_size / ws.getLocalBounds().height);

@@ -11,6 +11,16 @@ public:
 
 	sf::RenderWindow& get_mWindow() { return mWindow; };
 
+	sf::Texture& get_bt() { return bt; }
+	sf::Texture& get_wt() { return wt; }
+
+
+	void LoadTextures()
+	{
+		bt.loadFromFile("black_stone.bmp");
+		wt.loadFromFile("white_stone.bmp");
+	}
+
 	~Game();
 
 protected:
