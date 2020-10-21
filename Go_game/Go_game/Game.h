@@ -14,12 +14,9 @@ public:
 	sf::Texture& get_bt() { return bt; }
 	sf::Texture& get_wt() { return wt; }
 
+	void LoadTextures();
 
-	void LoadTextures()
-	{
-		bt.loadFromFile("black_stone.bmp");
-		wt.loadFromFile("white_stone.bmp");
-	}
+	void AddSmoothness();
 
 	~Game();
 

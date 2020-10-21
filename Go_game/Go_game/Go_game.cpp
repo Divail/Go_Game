@@ -327,13 +327,9 @@ int main()
 
 	Game R(s);
 
-	R.get_bt().loadFromFile("black_stone.bmp");
-	R.get_wt().loadFromFile("white_stone.bmp");
+	R.LoadTextures();
 
-	// Apply Smoothness for Black Stone
-	R.get_bt().setSmooth(true);
-	// Apply Smoothness for White Stone
-	R.get_wt().setSmooth(true);
+	R.AddSmoothness();
 
 	// Apply texture for Black Stone
 	Sprite bs(R.get_bt());

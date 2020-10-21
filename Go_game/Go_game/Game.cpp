@@ -12,6 +12,20 @@ Game::Game(sf::ContextSettings mS)
 	
 }
 
+void Game::LoadTextures()
+{
+	bt.loadFromFile("black_stone.bmp");
+	wt.loadFromFile("white_stone.bmp");
+}
+
+void Game::AddSmoothness()
+{
+	// Apply Smoothness for Black Stone
+	bt.setSmooth(true);
+	// Apply Smoothness for White Stone
+	wt.setSmooth(true);
+}
+
 
 Game::~Game()
 {
