@@ -291,8 +291,6 @@ void MousePressEvent(Sprite& bs, Sprite& ws, RenderWindow& window, Event e, Game
 
 			}
 
-
-
 		}
 	}
 }
@@ -331,17 +329,14 @@ int main()
 
 	R.AddSmoothness();
 
-	// Apply texture for Black Stone
-	Sprite bs(R.get_bt());
-	// Apply texture for White Stone
-	Sprite ws(R.get_wt());
+	R.ApplyTextures();
 
-	bs.setScale(cell_size / bs.getLocalBounds().width, cell_size / bs.getLocalBounds().height);
-	ws.setScale(cell_size / ws.getLocalBounds().width, cell_size / ws.getLocalBounds().height);
+	R.get_bs().setScale(cell_size / R.get_bs().getLocalBounds().width, cell_size / R.get_bs().getLocalBounds().height);
+	R.get_ws().setScale(cell_size / R.get_ws().getLocalBounds().width, cell_size / R.get_ws().getLocalBounds().height);
 
-	update(bs, ws, R.get_mWindow(), R);
+	update(R.get_bs(), R.get_ws(), R.get_mWindow(), R);
 
-	WindowIsOpen(bs, ws, R.get_mWindow(), R);
+	WindowIsOpen(R.get_bs(), R.get_ws(), R.get_mWindow(), R);
 
 	return 0;
 }
