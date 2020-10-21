@@ -13,6 +13,7 @@
 #include <SFML/Graphics.hpp>
 #include <Windows.h>
 #include <assert.h>
+#include "Game.h"
 
 
 /***************************************************************************************/
@@ -243,21 +244,21 @@ void draw_stone(Sprite& bs, Sprite& ws, RenderWindow& window)
 
 
 /***************************************************************************************/
-void update(Sprite& bs, Sprite& ws, RenderWindow& window)
+void update(Sprite& bs, Sprite& ws, RenderWindow& window, Game& R)
 {
 	window.clear(Color(255, 207, 97));
 
 	draw_board(window);
 
 	// Draw stone
-	draw_stone(bs, ws, window);
+	draw_stone(bs, ws, R.get_mWindow());
 
 	window.display();
 };
 
 
 /***************************************************************************************/
-void MousePressEvent(Sprite& bs, Sprite& ws, RenderWindow& window, Event e)
+void MousePressEvent(Sprite& bs, Sprite& ws, RenderWindow& window, Event e, Game& R)
 {
 	if (e.type == Event::MouseButtonPressed)
 	{
@@ -272,7 +273,7 @@ void MousePressEvent(Sprite& bs, Sprite& ws, RenderWindow& window, Event e)
 			{
 				board[ix][iy] = BLACK;
 				remove_dead_stone(WHITE);
-				update(bs, ws, window);
+				update(bs, ws, R.get_mWindow(), R);
 
 
 				// AI
@@ -286,7 +287,7 @@ void MousePressEvent(Sprite& bs, Sprite& ws, RenderWindow& window, Event e)
 				ix -= 'A';
 				board[iy - 1][ix] = WHITE;  // AI will play white stones!
 				remove_dead_stone(BLACK);
-				update(bs, ws, window);
+				update(bs, ws, R.get_mWindow(), R);
 
 			}
 
@@ -298,7 +299,7 @@ void MousePressEvent(Sprite& bs, Sprite& ws, RenderWindow& window, Event e)
 
 
 /***************************************************************************************/
-void WindowIsOpen(Sprite& bs, Sprite& ws, RenderWindow& window)
+void WindowIsOpen(Sprite& bs, Sprite& ws, RenderWindow& window, Game& R)
 {
 	while (window.isOpen())
 	{
@@ -308,10 +309,10 @@ void WindowIsOpen(Sprite& bs, Sprite& ws, RenderWindow& window)
 			if (e.type == Event::Closed)
 				window.close();
 
-			MousePressEvent(bs, ws, window, e);
+			MousePressEvent(bs, ws, R.get_mWindow(), e, R);
 			
 		}
-		update(bs, ws, window);
+		update(bs, ws, R.get_mWindow(), R);
 	}
 }
 
@@ -324,7 +325,7 @@ int main()
 	ContextSettings s;
 	s.antialiasingLevel = 8;
 
-	RenderWindow window(VideoMode(cell_size * 19, cell_size * 19), "Go", Style::Default, s);
+	Game R(s);
 
 	// Black Stone
 	Texture bt;
@@ -347,9 +348,9 @@ int main()
 	bs.setScale(cell_size / bs.getLocalBounds().width, cell_size / bs.getLocalBounds().height);
 	ws.setScale(cell_size / ws.getLocalBounds().width, cell_size / ws.getLocalBounds().height);
 
-	update(bs, ws, window);
+	update(bs, ws, R.get_mWindow(), R);
 
-	WindowIsOpen(bs, ws, window);
+	WindowIsOpen(bs, ws, R.get_mWindow(), R);
 
 	return 0;
 }
