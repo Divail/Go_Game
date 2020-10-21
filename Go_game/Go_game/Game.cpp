@@ -26,6 +26,11 @@ void Game::AddSmoothness()
 	wt.setSmooth(true);
 }
 
+void Game::ApplyTextures()
+{
+	bs.setTexture(bt);
+	ws.setTexture(wt);
+}
 
 Game::~Game()
 {
