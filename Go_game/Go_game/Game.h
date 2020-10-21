@@ -23,6 +23,8 @@ public:
 
 	void ApplyTextures();
 
+	void SetScale();
+
 	~Game();
 
 protected:

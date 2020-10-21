@@ -331,8 +331,7 @@ int main()
 
 	R.ApplyTextures();
 
-	R.get_bs().setScale(cell_size / R.get_bs().getLocalBounds().width, cell_size / R.get_bs().getLocalBounds().height);
-	R.get_ws().setScale(cell_size / R.get_ws().getLocalBounds().width, cell_size / R.get_ws().getLocalBounds().height);
+	R.SetScale();
 
 	update(R.get_bs(), R.get_ws(), R.get_mWindow(), R);
 

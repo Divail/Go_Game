@@ -32,6 +32,12 @@ void Game::ApplyTextures()
 	ws.setTexture(wt);
 }
 
+void Game::SetScale()
+{
+	bs.setScale(40 / bs.getLocalBounds().width, 40 / bs.getLocalBounds().height);
+	ws.setScale(40 / ws.getLocalBounds().width, 40 / ws.getLocalBounds().height);
+}
+
 Game::~Game()
 {
 }
