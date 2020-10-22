@@ -165,17 +165,7 @@ void remove_dead_stone(int color, Game& R)
 
 
 /***************************************************************************************/
-void update(Sprite& bs, Sprite& ws, RenderWindow& window, Game& R)
-{
-	window.clear(Color(255, 207, 97));
 
-	R.draw_board();
-
-	// Draw stone
-	R.draw_stone();
-
-	window.display();
-};
 
 
 /***************************************************************************************/
@@ -194,7 +184,7 @@ void MousePressEvent(Sprite& bs, Sprite& ws, RenderWindow& window, Event e, Game
 			{
 				R.get_board(ix, iy) = BLACK;
 				remove_dead_stone(WHITE, R);
-				update(bs, ws, R.get_mWindow(), R);
+				R.update();
 
 
 				// AI
@@ -208,7 +198,7 @@ void MousePressEvent(Sprite& bs, Sprite& ws, RenderWindow& window, Event e, Game
 				ix -= 'A';
 				R.get_board(iy - 1, ix) = WHITE;  // AI will play white stones!
 				remove_dead_stone(BLACK, R);
-				update(bs, ws, R.get_mWindow(), R);
+				R.update();
 
 			}
 
@@ -231,7 +221,7 @@ void WindowIsOpen(Sprite& bs, Sprite& ws, RenderWindow& window, Game& R)
 			MousePressEvent(bs, ws, R.get_mWindow(), e, R);
 			
 		}
-		update(bs, ws, R.get_mWindow(), R);
+		R.update();
 	}
 }
 
@@ -254,7 +244,7 @@ int main()
 
 	R.SetScale();
 
-	update(R.get_bs(), R.get_ws(), R.get_mWindow(), R);
+	R.update();
 
 	WindowIsOpen(R.get_bs(), R.get_ws(), R.get_mWindow(), R);
 

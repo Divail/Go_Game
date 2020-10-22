@@ -39,6 +39,8 @@ public:
 
 	void draw_board();
 
+	void update();
+
 	~Game();
 
 protected:

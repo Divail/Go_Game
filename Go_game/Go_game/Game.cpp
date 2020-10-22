@@ -108,6 +108,18 @@ void Game::draw_stone()
 
 };
 
+void Game::update()
+{
+	mWindow.clear(sf::Color(255, 207, 97));
+
+	draw_board();
+
+	// Draw stone
+	draw_stone();
+
+	mWindow.display();
+};
+
 Game::~Game()
 {
 }
