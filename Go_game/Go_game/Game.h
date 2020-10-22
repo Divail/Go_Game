@@ -41,6 +41,10 @@ public:
 
 	void update();
 
+	void remove_dead_stone(int color);
+
+	bool live_check(int color, int x, int y);
+
 	~Game();
 
 protected:

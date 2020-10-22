@@ -110,65 +110,6 @@ void CloseConnection()
 
 
 /***************************************************************************************/
-bool live_check(int color, int x, int y, Game& R)
-{
-	if (R.get_visit(y,x))
-		return false;			// to remove cycle
-
-	R.get_visit(y, x) = true;
-
-	if (R.get_board(y, x) == 0)
-	{
-		return true;			// empty space means the dragon is alive
-	}
-
-	if (R.get_board(y, x) != color)
-		return false;			// captured by enemy stone
-
-	// recursive search
-	bool
-		r = x > 0 && live_check(color, x - 1, y, R);
-	r |= x < 19 - 1 && live_check(color, x + 1, y, R);
-	r |= x > 0 && live_check(color, x, y - 1, R);
-	r |= y < 19 - 1 && live_check(color, x, y + 1, R);
-
-	return r;
-}
-
-
-/***************************************************************************************/
-void remove_dead_stone(int color, Game& R)
-{
-	int capture[19][19] = { 0 };
-
-	for (int y = 0; y < 19; y++)
-		for (int x = 0; x < 19; x++)
-		{
-			if (R.get_board(y, x) != color)
-				continue;
-
-			for (int i = 0; i < 19; i++)
-				for (int j = 0; j < 19; j++)
-					R.get_visit(i, j) = false;
-
-			if (live_check(color, x, y, R) == false)
-				capture[y][x] = 1;
-		}
-
-	for (int y = 0; y < 19; y++)
-		for (int x = 0; x < 19; x++)
-		{
-			if (capture[y][x])
-				R.get_board(y, x) = 0;
-		}
-};
-
-
-/***************************************************************************************/
-
-
-
-/***************************************************************************************/
 void MousePressEvent(Sprite& bs, Sprite& ws, RenderWindow& window, Event e, Game& R)
 {
 	if (e.type == Event::MouseButtonPressed)
@@ -183,7 +124,7 @@ void MousePressEvent(Sprite& bs, Sprite& ws, RenderWindow& window, Event e, Game
 			if (R.get_board(ix, iy) != BLACK && R.get_board(ix, iy) != WHITE)
 			{
 				R.get_board(ix, iy) = BLACK;
-				remove_dead_stone(WHITE, R);
+				R.remove_dead_stone(WHITE);
 				R.update();
 
 
@@ -197,7 +138,7 @@ void MousePressEvent(Sprite& bs, Sprite& ws, RenderWindow& window, Event e, Game
 				if (ix >= 'J') ix--;
 				ix -= 'A';
 				R.get_board(iy - 1, ix) = WHITE;  // AI will play white stones!
-				remove_dead_stone(BLACK, R);
+				R.remove_dead_stone(BLACK);
 				R.update();
 
 			}
