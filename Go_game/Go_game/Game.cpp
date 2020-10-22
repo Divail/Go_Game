@@ -1,23 +1,30 @@
 #include "Game.h"
 
+
+/***************************************************************************************/
 Game::Game()
-{
-
-}
-
-Game::Game(sf::ContextSettings mS)
 :
-	mWindow(sf::VideoMode(40 * 19, 40 * 19), "Go", sf::Style::Default, mS)
+	mWindow(sf::VideoMode(get_cell() * 19, get_cell() * 19), "Go", sf::Style::Default, mS)
 {
-	
+	mS.antialiasingLevel = 8;
 }
 
+
+/***************************************************************************************/
+Game::~Game()
+{
+}
+
+
+/***************************************************************************************/
 void Game::LoadTextures()
 {
 	bt.loadFromFile("black_stone.bmp");
 	wt.loadFromFile("white_stone.bmp");
 }
 
+
+/***************************************************************************************/
 void Game::AddSmoothness()
 {
 	// Apply Smoothness for Black Stone
@@ -26,18 +33,24 @@ void Game::AddSmoothness()
 	wt.setSmooth(true);
 }
 
+
+/***************************************************************************************/
 void Game::ApplyTextures()
 {
 	bs.setTexture(bt);
 	ws.setTexture(wt);
 }
 
+
+/***************************************************************************************/
 void Game::SetScale()
 {
 	bs.setScale(40 / bs.getLocalBounds().width, 40 / bs.getLocalBounds().height);
 	ws.setScale(40 / ws.getLocalBounds().width, 40 / ws.getLocalBounds().height);
 }
 
+
+/***************************************************************************************/
 void Game::draw_board()
 {
 	float half_cell = cell_size / 2.0;
@@ -89,6 +102,8 @@ void Game::draw_board()
 		}
 };
 
+
+/***************************************************************************************/
 void Game::draw_stone()
 {
 	for (int y = 0; y < 19; y++)
@@ -108,6 +123,8 @@ void Game::draw_stone()
 
 };
 
+
+/***************************************************************************************/
 void Game::update()
 {
 	mWindow.clear(sf::Color(255, 207, 97));
@@ -120,6 +137,8 @@ void Game::update()
 	mWindow.display();
 };
 
+
+/***************************************************************************************/
 void Game::remove_dead_stone(int color)
 {
 	int capture[19][19] = { 0 };
@@ -146,6 +165,8 @@ void Game::remove_dead_stone(int color)
 		}
 };
 
+
+/***************************************************************************************/
 bool Game::live_check(int color, int x, int y)
 {
 	if ( visit[y][x] )
@@ -171,6 +192,144 @@ bool Game::live_check(int color, int x, int y)
 	return r;
 }
 
-Game::~Game()
+
+/***************************************************************************************/
+void Game::ConnectToEngine()
 {
+	pipin_w = pipin_r = pipout_w = pipout_r = NULL;
+	sats.nLength = sizeof(sats);
+	sats.bInheritHandle = TRUE;
+	sats.lpSecurityDescriptor = NULL;
+
+	CreatePipe(&pipout_r, &pipout_w, &sats, 0);
+	CreatePipe(&pipin_r, &pipin_w, &sats, 0);
+
+	sti.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+	sti.wShowWindow = SW_HIDE;
+	sti.hStdInput = pipin_r;
+	sti.hStdOutput = pipout_w;
+	sti.hStdError = pipout_w;
+
+	assert(CreateProcess(NULL, (char*)path, NULL, NULL, TRUE, 0, NULL, NULL, &sti, &pi));
+}
+
+
+/***************************************************************************************/
+std::string Game::getNextMove(std::string position)
+{
+
+	std::string str;
+
+	position = "play black " + position + "\ngenmove white\n";
+
+	printf("%s\n", position.c_str());
+
+	WriteFile(pipin_w, position.c_str(), position.length(), &write, NULL);
+	Sleep(500);
+
+	PeekNamedPipe(pipout_r, buffer, sizeof(buffer), &read, &avaiable, NULL);
+
+A:
+	do
+	{
+		ZeroMemory(buffer, sizeof(buffer));
+		if (!ReadFile(pipout_r, buffer, sizeof(buffer), &read, NULL) || !read)
+			break;
+
+		buffer[read] = 0;
+
+		str += (char*)buffer;
+	} while (read >= sizeof(buffer));
+
+	if (str.length() <= 5)
+		goto A;
+
+	printf("%s\n", str.c_str());
+
+	int n = str.rfind("=");
+
+
+	return str.substr(n + 1);
+}
+
+
+/***************************************************************************************/
+void Game::CloseConnection()
+{
+	WriteFile(pipin_w, "quit\n", 5, &write, NULL);
+
+	if (pipin_w)     CloseHandle(pipin_w);
+	if (pipin_r)     CloseHandle(pipin_r);
+	if (pipout_w)    CloseHandle(pipout_w);
+	if (pipout_r)    CloseHandle(pipout_r);
+	if (pi.hProcess) CloseHandle(pi.hProcess);
+	if (pi.hThread)  CloseHandle(pi.hThread);
+}
+
+
+/***************************************************************************************/
+void Game::MousePressEvent()
+{
+	if (e.type == sf::Event::MouseButtonPressed)
+	{
+
+		int ix = e.mouseButton.x / cell_size;
+		int iy = e.mouseButton.y / cell_size;
+
+		// Put Black Stone with left click
+		if (e.mouseButton.button == sf::Mouse::Left)
+		{
+			if (board[ix][iy] != BLACK && board[ix][iy] != WHITE)
+			{
+				board[ix][iy] = BLACK;
+
+				remove_dead_stone(WHITE);
+
+				update();
+
+
+				// AI
+				char move[10] = { 0 };
+
+				ix += 'A';
+
+				if (ix >= 'I') ix += 1;
+
+				sprintf(move, "%c%d", ix, iy + 1);
+
+				std::string ret = getNextMove(move);
+
+				sscanf(ret.c_str(), " %c%d\r\n\r\n", &ix, &iy);
+
+				if (ix >= 'J') ix--;
+
+				ix -= 'A';
+				get_board(iy - 1, ix) = WHITE;  // AI will play white stones!
+
+				remove_dead_stone(BLACK);
+
+				update();
+
+			}
+
+		}
+	}
+}
+
+
+/***************************************************************************************/
+void Game::WindowIsOpen()
+{
+	while (mWindow.isOpen())
+	{
+		while (mWindow.pollEvent(e))
+		{
+			if (e.type == sf::Event::Closed)
+				mWindow.close();
+
+			MousePressEvent();
+
+		}
+		update();
+	}
 }
