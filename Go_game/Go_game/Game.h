@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <Windows.h>
 #include <assert.h>
 
@@ -60,14 +61,19 @@ public:
 
 	void					  Run();
 
+	void					  Tests();
 
 protected:///////////////////////////////////////////////////////////////////////////////////
 	
 			// Init Data:
+
 	Board				mBoard;
 
 	const char*			path = "gnugo.exe --mode gtp";
-	
+	const char*			soundPath = "pop.wav";
+
+	sf::Sound			sound;
+
 	sf::Event			e;
 
 	sf::RenderWindow	mWindow;

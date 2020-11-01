@@ -177,7 +177,6 @@ A:
 
 	int n = str.rfind("=");
 
-
 	return str.substr(n + 1);
 }
 
@@ -199,17 +198,10 @@ void Game::CloseConnection()
 /***************************************************************************************/
 void Game::MousePressEvent()
 {
-	if (e.type == sf::Event::MouseButtonPressed)
-		if (e.mouseButton.button == sf::Mouse::Right)
-		{
-
-			NewTests();
-
-			Test_MyGame();
-
-			EndTests();
-
-		}
+	if (e.key.code == sf::Keyboard::F5)
+	{
+		Tests();
+	}
 
 	if (e.type == sf::Event::MouseButtonPressed)
 	{
@@ -224,18 +216,24 @@ void Game::MousePressEvent()
 			if (mBoard.get_board(ix, iy) != BLACK && mBoard.get_board(ix, iy) != WHITE)
 			{
 				mBoard.get_board(ix, iy) = BLACK;
+				
+				// Sound
+				sf::SoundBuffer buffer;
+				buffer.loadFromFile(soundPath);
+				sound.setBuffer(buffer);
+				sound.play();
 
 				remove_dead_stone(WHITE);
 
 				update();
-
 
 				// AI
 				char move[10] = { 0 };
 
 				ix += 'A';
 
-				if (ix >= 'I') ix += 1;
+				if (ix >= 'I') 
+					ix += 1;
 
 				sprintf(move, "%c%d", ix, iy + 1);
 
@@ -243,16 +241,22 @@ void Game::MousePressEvent()
 
 				sscanf(ret.c_str(), " %c%d\r\n\r\n", &ix, &iy);
 
-				if (ix >= 'J') ix--;
+				if (ix >= 'J') 
+					ix--;
 
 				ix -= 'A';
+
 				mBoard.get_board(iy - 1, ix) = WHITE;  // AI will play white stones!
+
+				sound.play();
 
 				remove_dead_stone(BLACK);
 
 				update();
 
 			}
+
+
 
 		}
 	}
@@ -292,4 +296,14 @@ void Game::Run()
 	update();
 
 	WindowIsOpen();
+}
+
+
+void Game::Tests()
+{
+	NewTests();
+
+	Test_MyGame();
+
+	EndTests();
 }
