@@ -1,7 +1,11 @@
 #pragma once
+
 #include <SFML/Graphics.hpp>
 #include <Windows.h>
 #include <assert.h>
+
+#include "Board.h"
+#include "MyTests.h"
 
 #define BLACK (1)
 #define WHITE (2)
@@ -10,26 +14,20 @@ class Game
 {
 public:
 
-	Game();
+	Game(  );
 	~Game();
 
 	// -----------------------
 	// Get Methods:
-	const sf::RenderWindow&	  get_mWindow() const			{ return mWindow; };
+	sf::RenderWindow&		  get_mWindow() 			{ return mWindow; };
 
-	const sf::Texture&		  get_bt()		const			{ return bt; }
-	const sf::Texture&	      get_wt()		const			{ return wt; }
+	const sf::Texture&		  get_bt()		const		{ return bt; }
+	const sf::Texture&	      get_wt()		const		{ return wt; }
 
-	const sf::Sprite&		  get_bs()		const			{ return bs; }
-	const sf::Sprite&		  get_ws()		const			{ return ws; }
+	sf::Sprite&				  get_bs()					{ return bs; }
+	sf::Sprite&				  get_ws()					{ return ws; }
 
-	const int&				  get_cell()	const			{ return cell_size;  }
-
-	bool&					  get_visit(int x, int y)		{ return visit[x][y]; }
-
-	auto&			          get_board(int x, int y)		{ return board[x][y]; }
-
-	STARTUPINFO&			  get_sti()						{ return sti; }
+	STARTUPINFO&			  get_sti()					{ return sti; }
 	
 
 	// -----------------------
@@ -39,10 +37,7 @@ public:
 	void					  ApplyTextures();
 	void					  SetScale();
 
-	// -----------------------
-	// Face Metods:
-	void					  draw_stone();
-	void					  draw_board();
+
 
 	// -----------------------
 	// Logic Metods: 
@@ -63,11 +58,13 @@ public:
 
 	void					  WindowIsOpen();
 
+	void					  Run();
+
 
 protected:///////////////////////////////////////////////////////////////////////////////////
 	
 			// Init Data:
-	int					cell_size = 40;
+	Board				mBoard;
 
 	const char*			path = "gnugo.exe --mode gtp";
 	
@@ -78,9 +75,6 @@ protected://////////////////////////////////////////////////////////////////////
 	sf::ContextSettings mS;
 
 			// Runtime Data:
-	int					board[19][19] = { 0 };
-	bool				visit[19][19];
-
 	// Black Stone
 	sf::Texture			bt;
 	// White Stone

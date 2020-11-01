@@ -1,0 +1,17 @@
+===================================================
+                  New Tests
+
+DONE: Test_MyGame.cpp: Board_Move: 11 board.get_board(1, 1) = BLACK
+DONE: Test_MyGame.cpp: Board_Move: 12 board.get_visit(1, 1) = 1
+
+===============
+Total tests: 2
+Done tests: 2
+Fail tests: 0
+===============
+
+                  End Tests
+===================================================
+===================================================
+
+

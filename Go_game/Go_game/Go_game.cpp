@@ -13,7 +13,9 @@
 #include <SFML/Graphics.hpp>
 #include <Windows.h>
 #include <assert.h>
+
 #include "Game.h"
+#include "MyTests.h"
 
 
 /***************************************************************************************/
@@ -22,24 +24,15 @@ using namespace sf;
 
 
 /***************************************************************************************/
+
+
+/***************************************************************************************/
 int main()
 {
 
-	Game game;
+	Game  game;
 
-	game.ConnectToEngine();
-
-	game.LoadTextures();
-
-	game.AddSmoothness();
-
-	game.ApplyTextures();
-
-	game.SetScale();
-
-	game.update();
-
-	game.WindowIsOpen();
+	game.Run();
 
 	return 0;
 }

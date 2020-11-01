@@ -1,10 +1,13 @@
 #include "Game.h"
 
+void Test_MyGame();
+
 
 /***************************************************************************************/
 Game::Game()
 :
-	mWindow(sf::VideoMode(get_cell() * 19, get_cell() * 19), "Go", sf::Style::Default, mS)
+	mBoard( *this ),
+	mWindow(sf::VideoMode(mBoard.get_cell() * 19, mBoard.get_cell() * 19), "Go", sf::Style::Default, mS)
 {
 	mS.antialiasingLevel = 8;
 }
@@ -45,83 +48,9 @@ void Game::ApplyTextures()
 /***************************************************************************************/
 void Game::SetScale()
 {
-	bs.setScale(40 / bs.getLocalBounds().width, 40 / bs.getLocalBounds().height);
-	ws.setScale(40 / ws.getLocalBounds().width, 40 / ws.getLocalBounds().height);
+	bs.setScale(mBoard.get_cell() / bs.getLocalBounds().width, mBoard.get_cell() / bs.getLocalBounds().height);
+	ws.setScale(mBoard.get_cell() / ws.getLocalBounds().width, mBoard.get_cell() / ws.getLocalBounds().height);
 }
-
-
-/***************************************************************************************/
-void Game::draw_board()
-{
-	float half_cell = cell_size / 2.0;
-
-	// Draw horizontal lines
-	for (int y = 0; y < 19; y++)
-	{
-		sf::Vertex hline[] =
-		{
-			sf::Vertex(sf::Vector2f(half_cell, half_cell + y * cell_size)),
-			sf::Vertex(sf::Vector2f(cell_size * 19 - half_cell, half_cell + y * cell_size))
-		};
-
-		hline[0].color = sf::Color::Black;
-		hline[1].color = sf::Color::Black;
-
-		mWindow.draw(hline, 2, sf::Lines);
-	}
-
-	// Draw vertical lines
-	for (int x = 0; x < 19; x++)
-	{
-		sf::Vertex vline[] =
-		{
-			sf::Vertex(sf::Vector2f(half_cell + x * cell_size, half_cell)),
-			sf::Vertex(sf::Vector2f(half_cell + x * cell_size, cell_size * 19 - half_cell))
-		};
-
-		vline[0].color = sf::Color::Black;
-		vline[1].color = sf::Color::Black;
-
-		mWindow.draw(vline, 2, sf::Lines);
-	}
-
-
-	// Draw Start Points
-	float start_point_r = half_cell / 5;
-
-	sf::CircleShape circle(start_point_r);
-	circle.setFillColor(sf::Color::Black);
-
-	for (int y = 0; y < 3; y++)
-		for (int x = 0; x < 3; x++)
-		{
-			circle.setPosition(half_cell + (3 + 6 * x) * cell_size - start_point_r,
-				half_cell + (3 + 6 * y) * cell_size - start_point_r);
-
-			mWindow.draw(circle);
-		}
-};
-
-
-/***************************************************************************************/
-void Game::draw_stone()
-{
-	for (int y = 0; y < 19; y++)
-		for (int x = 0; x < 19; x++)
-		{
-			if (board[x][y] == BLACK)
-			{
-				bs.setPosition(x * cell_size, y * cell_size);
-				mWindow.draw(bs);
-			}
-			else if (board[x][y] == WHITE)
-			{
-				ws.setPosition(x * cell_size, y * cell_size);
-				mWindow.draw(ws);
-			}
-		}
-
-};
 
 
 /***************************************************************************************/
@@ -129,10 +58,10 @@ void Game::update()
 {
 	mWindow.clear(sf::Color(255, 207, 97));
 
-	draw_board();
+	mBoard.draw_board();
 
 	// Draw stone
-	draw_stone();
+	mBoard.draw_stone();
 
 	mWindow.display();
 };
@@ -146,12 +75,12 @@ void Game::remove_dead_stone(int color)
 	for (int y = 0; y < 19; y++)
 		for (int x = 0; x < 19; x++)
 		{
-			if (board[y][x] != color)
+			if (mBoard.get_board(y, x) != color)
 				continue;
 
 			for (int i = 0; i < 19; i++)
 				for (int j = 0; j < 19; j++)
-					visit[i][j] = false;
+					mBoard.get_visit(i, j) = false;
 
 			if (live_check(color, x, y) == false)
 				capture[y][x] = 1;
@@ -161,7 +90,7 @@ void Game::remove_dead_stone(int color)
 		for (int x = 0; x < 19; x++)
 		{
 			if (capture[y][x])
-				board[y][x] = 0;
+				mBoard.get_board(y, x) = 0;
 		}
 };
 
@@ -169,17 +98,17 @@ void Game::remove_dead_stone(int color)
 /***************************************************************************************/
 bool Game::live_check(int color, int x, int y)
 {
-	if ( visit[y][x] )
+	if (mBoard.get_visit(y, x) )
 		return false;			// to remove cycle
 
-	visit[y][x] = true;
+	mBoard.get_visit(y, x) = true;
 
-	if (board[y][x] == 0)
+	if (mBoard.get_board(y, x) == 0)
 	{
 		return true;			// empty space means the dragon is alive
 	}
 
-	if (board[y][x] != color)
+	if (mBoard.get_board(y, x) != color)
 		return false;			// captured by enemy stone
 
 	// recursive search
@@ -271,17 +200,30 @@ void Game::CloseConnection()
 void Game::MousePressEvent()
 {
 	if (e.type == sf::Event::MouseButtonPressed)
+		if (e.mouseButton.button == sf::Mouse::Right)
+		{
+
+			NewTests();
+
+			Test_MyGame();
+
+			EndTests();
+
+		}
+
+	if (e.type == sf::Event::MouseButtonPressed)
 	{
 
-		int ix = e.mouseButton.x / cell_size;
-		int iy = e.mouseButton.y / cell_size;
+		int ix = e.mouseButton.x / mBoard.get_cell();
+		int iy = e.mouseButton.y / mBoard.get_cell();
+
 
 		// Put Black Stone with left click
 		if (e.mouseButton.button == sf::Mouse::Left)
 		{
-			if (board[ix][iy] != BLACK && board[ix][iy] != WHITE)
+			if (mBoard.get_board(ix, iy) != BLACK && mBoard.get_board(ix, iy) != WHITE)
 			{
-				board[ix][iy] = BLACK;
+				mBoard.get_board(ix, iy) = BLACK;
 
 				remove_dead_stone(WHITE);
 
@@ -304,7 +246,7 @@ void Game::MousePressEvent()
 				if (ix >= 'J') ix--;
 
 				ix -= 'A';
-				get_board(iy - 1, ix) = WHITE;  // AI will play white stones!
+				mBoard.get_board(iy - 1, ix) = WHITE;  // AI will play white stones!
 
 				remove_dead_stone(BLACK);
 
@@ -332,4 +274,22 @@ void Game::WindowIsOpen()
 		}
 		update();
 	}
+}
+
+
+void Game::Run()
+{
+	ConnectToEngine();
+
+	LoadTextures();
+
+	AddSmoothness();
+
+	ApplyTextures();
+
+	SetScale();
+
+	update();
+
+	WindowIsOpen();
 }
