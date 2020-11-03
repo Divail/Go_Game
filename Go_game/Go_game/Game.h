@@ -4,7 +4,6 @@
 #include <SFML/Audio.hpp>
 #include <Windows.h>
 #include <assert.h>
-#include <strstream>
 #include <sstream>
 
 #include "Board.h"

@@ -243,13 +243,25 @@ void Game::MousePressEvent()
 				if (ix >= 'I') 
 					ix += 1;
 
+				//
+				// MY MOVE:
+				//
 				//sprintf(move, "%c%d", ix, iy + 1);
 				std::ostringstream buff;
 				buff << (char)ix << iy + 1;
 
+
+				// SEND TO ENGINE and GET HIS MOVE:
 				std::string ret = getNextMove( buff.str() );
-				std::strstream buff2( (char*)ret.c_str(), ret.size() );
-				buff2 >> ix >> iy;
+
+
+				//
+				// EXTRACT ENGINE MOVE from string:
+				//
+				char ch;
+				std::istringstream buff2( ret );
+				buff2 >> ch >> iy;
+				ix = ch;
 
 				if (ix >= 'J') 
 					ix--;
