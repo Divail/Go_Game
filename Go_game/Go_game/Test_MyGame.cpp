@@ -10,8 +10,12 @@ void Board_Move()
 
 	Board board( game );
 
-	DO_TEST( board.get_board(1, 1) = BLACK);
-	DO_TEST( board.get_visit(1, 1) = 1 );
+
+	board.get_board(1, 1) = BLACK;
+	DO_TEST( board.get_board(1, 1) == BLACK );
+
+	board.get_visit(1, 1) = 1;
+	DO_TEST( board.get_visit(1, 1) == 1 );
 
 }
 

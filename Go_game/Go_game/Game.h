@@ -4,6 +4,7 @@
 #include <SFML/Audio.hpp>
 #include <Windows.h>
 #include <assert.h>
+#include <strstream>
 
 #include "Board.h"
 #include "MyTests.h"
@@ -79,6 +80,8 @@ protected://////////////////////////////////////////////////////////////////////
 	sf::RenderWindow	mWindow;
 	
 	sf::ContextSettings mS;
+
+	int					mTestCounter = 0;
 
 			// Runtime Data:
 	// Black Stone

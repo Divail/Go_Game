@@ -1,4 +1,7 @@
+#include <iostream>
+
 #include "Game.h"
+
 
 void Test_MyGame();
 
@@ -151,7 +154,7 @@ std::string Game::getNextMove(std::string position)
 
 	position = "play black " + position + "\ngenmove white\n";
 
-	printf("%s\n", position.c_str());
+	std::cout << "\n" << position;
 
 	WriteFile(pipin_w, position.c_str(), position.length(), &write, NULL);
 	Sleep(500);
@@ -173,7 +176,7 @@ A:
 	if (str.length() <= 5)
 		goto A;
 
-	printf("%s\n", str.c_str());
+	std::cout << "\n" << str;
 
 	int n = str.rfind("=");
 
@@ -198,9 +201,14 @@ void Game::CloseConnection()
 /***************************************************************************************/
 void Game::MousePressEvent()
 {
-	if (e.key.code == sf::Keyboard::F5)
+	if (mTestCounter < 1)
 	{
-		Tests();
+		if (e.key.code == sf::Keyboard::F6)
+		{
+			Tests();
+		}
+
+		++mTestCounter;
 	}
 
 	if (e.type == sf::Event::MouseButtonPressed)
@@ -238,8 +246,8 @@ void Game::MousePressEvent()
 				sprintf(move, "%c%d", ix, iy + 1);
 
 				std::string ret = getNextMove(move);
-
-				sscanf(ret.c_str(), " %c%d\r\n\r\n", &ix, &iy);
+				std::strstream buff( (char*)ret.c_str(), ret.size() );
+				buff >> ix >> iy;
 
 				if (ix >= 'J') 
 					ix--;
@@ -255,13 +263,9 @@ void Game::MousePressEvent()
 				update();
 
 			}
-
-
-
 		}
 	}
 }
-
 
 /***************************************************************************************/
 void Game::WindowIsOpen()
@@ -297,7 +301,6 @@ void Game::Run()
 
 	WindowIsOpen();
 }
-
 
 void Game::Tests()
 {
