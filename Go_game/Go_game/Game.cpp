@@ -236,18 +236,20 @@ void Game::MousePressEvent()
 				update();
 
 				// AI
-				char move[10] = { 0 };
+				//char move[10] = { 0 };
 
 				ix += 'A';
 
 				if (ix >= 'I') 
 					ix += 1;
 
-				sprintf(move, "%c%d", ix, iy + 1);
+				//sprintf(move, "%c%d", ix, iy + 1);
+				std::ostringstream buff;
+				buff << (char)ix << iy + 1;
 
-				std::string ret = getNextMove(move);
-				std::strstream buff( (char*)ret.c_str(), ret.size() );
-				buff >> ix >> iy;
+				std::string ret = getNextMove( buff.str() );
+				std::strstream buff2( (char*)ret.c_str(), ret.size() );
+				buff2 >> ix >> iy;
 
 				if (ix >= 'J') 
 					ix--;
