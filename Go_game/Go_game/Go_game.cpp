@@ -17,12 +17,9 @@
 /***************************************************************************************/
 int main()
 {
-	Game  game;
-	Menu menu(game.get_mWindow().getSize().x, game.get_mWindow().getSize().x);
+	Menu menu;
 
 	menu.Run();
-
-	game.Run();
 
 	return 0;
 }
