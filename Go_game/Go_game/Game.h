@@ -26,6 +26,8 @@ public:
 	const sf::Texture&		  get_bt()		const		{ return bt; }
 	const sf::Texture&	      get_wt()		const		{ return wt; }
 
+	sf::Event&				  get_event()				{ return e; }
+
 	sf::Sprite&				  get_bs()					{ return bs; }
 	sf::Sprite&				  get_ws()					{ return ws; }
 

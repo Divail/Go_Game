@@ -9,25 +9,18 @@
 
 
 /***************************************************************************************/
-#include <iostream>
-#include <SFML/Graphics.hpp>
-#include <Windows.h>
-#include <assert.h>
-
 #include "Game.h"
 #include "MyTests.h"
-
-
-/***************************************************************************************/
-using namespace std;
-using namespace sf;
+#include "Menu.h"
 
 
 /***************************************************************************************/
 int main()
 {
-
 	Game  game;
+	Menu menu(game.get_mWindow().getSize().x, game.get_mWindow().getSize().x);
+
+	menu.Run();
 
 	game.Run();
 
