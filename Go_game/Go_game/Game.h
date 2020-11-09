@@ -42,7 +42,6 @@ public:
 	void					  SetScale();
 
 
-
 	// -----------------------
 	// Logic Metods: 
 	void					  update();

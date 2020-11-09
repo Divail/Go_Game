@@ -78,12 +78,12 @@ void Game::remove_dead_stone(int color)
 	for (int y = 0; y < 19; y++)
 		for (int x = 0; x < 19; x++)
 		{
-			if (mBoard.get_board(y, x) != color)
+			if (mBoard.set_board(y, x) != color)
 				continue;
 
 			for (int i = 0; i < 19; i++)
 				for (int j = 0; j < 19; j++)
-					mBoard.get_visit(i, j) = false;
+					mBoard.set_visit(i, j) = false;
 
 			if (live_check(color, x, y) == false)
 				capture[y][x] = 1;
@@ -93,7 +93,7 @@ void Game::remove_dead_stone(int color)
 		for (int x = 0; x < 19; x++)
 		{
 			if (capture[y][x])
-				mBoard.get_board(y, x) = 0;
+				mBoard.set_board(y, x) = 0;
 		}
 };
 
@@ -101,17 +101,17 @@ void Game::remove_dead_stone(int color)
 /***************************************************************************************/
 bool Game::live_check(int color, int x, int y)
 {
-	if (mBoard.get_visit(y, x) )
+	if (mBoard.set_visit(y, x) )
 		return false;			// to remove cycle
 
-	mBoard.get_visit(y, x) = true;
+	mBoard.set_visit(y, x) = true;
 
-	if (mBoard.get_board(y, x) == 0)
+	if (mBoard.set_board(y, x) == 0)
 	{
 		return true;			// empty space means the dragon is alive
 	}
 
-	if (mBoard.get_board(y, x) != color)
+	if (mBoard.set_board(y, x) != color)
 		return false;			// captured by enemy stone
 
 	// recursive search
@@ -221,9 +221,9 @@ void Game::MousePressEvent()
 		// Put Black Stone with left click
 		if (e.mouseButton.button == sf::Mouse::Left)
 		{
-			if (mBoard.get_board(ix, iy) != BLACK && mBoard.get_board(ix, iy) != WHITE)
+			if (mBoard.set_board(ix, iy) != BLACK && mBoard.set_board(ix, iy) != WHITE)
 			{
-				mBoard.get_board(ix, iy) = BLACK;
+				mBoard.set_board(ix, iy) = BLACK;
 				
 				// Sound
 				sf::SoundBuffer buffer;
@@ -268,7 +268,7 @@ void Game::MousePressEvent()
 
 				ix -= 'A';
 
-				mBoard.get_board(iy - 1, ix) = WHITE;  // AI will play white stones!
+				mBoard.set_board(iy - 1, ix) = WHITE;  // AI will play white stones!
 
 				sound.play();
 
@@ -299,6 +299,7 @@ void Game::WindowIsOpen()
 }
 
 
+/***************************************************************************************/
 void Game::Run()
 {
 	ConnectToEngine();
@@ -316,6 +317,8 @@ void Game::Run()
 	WindowIsOpen();
 }
 
+
+/***************************************************************************************/
 void Game::Tests()
 {
 	NewTests();

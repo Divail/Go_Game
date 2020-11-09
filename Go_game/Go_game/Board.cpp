@@ -20,7 +20,7 @@ Board::~Board()
 /***************************************************************************************/
 void Board::draw_board()
 {
-	float half_cell = cell_size / 2.0;
+	float half_cell = cell_size / 2;
 
 	// Draw horizontal lines
 	for (int y = 0; y < 19; y++)

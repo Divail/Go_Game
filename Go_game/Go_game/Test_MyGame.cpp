@@ -11,11 +11,11 @@ void Board_Move()
 	Board board( game );
 
 
-	board.get_board(1, 1) = BLACK;
-	DO_TEST( board.get_board(1, 1) == BLACK );
+	board.set_board(1, 1) = BLACK;
+	DO_TEST( board.set_board(1, 1) == BLACK );
 
-	board.get_visit(1, 1) = 1;
-	DO_TEST( board.get_visit(1, 1) == 1 );
+	board.set_visit(1, 1) = 1;
+	DO_TEST( board.set_visit(1, 1) == 1 );
 
 }
 
