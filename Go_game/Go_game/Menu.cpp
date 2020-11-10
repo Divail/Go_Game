@@ -1,6 +1,7 @@
 #include "Menu.h"
 
 
+/***************************************************************************************/
 Menu::Menu()
 	:
 	board(game)
@@ -16,25 +17,28 @@ Menu::Menu()
 	menu[0].setPosition(sf::Vector2f( game.get_mWindow().getSize().x / 2, game.get_mWindow().getSize().y / (MAX_NUMBER_OF_ITEMS + 1) * 1 ) );
 
 	menu[1].setFont(font);
-	menu[1].setFillColor(sf::Color::White);
+	menu[1].setFillColor(sf::Color::Black);
 	menu[1].setString("Options");
 	menu[1].setPosition(sf::Vector2f( game.get_mWindow().getSize().x / 2, game.get_mWindow().getSize().y / (MAX_NUMBER_OF_ITEMS + 1 ) * 2 ) );
 
 	menu[2].setFont(font);
-	menu[2].setFillColor(sf::Color::White);
+	menu[2].setFillColor(sf::Color::Black);
 	menu[2].setString("Exit");
 	menu[2].setPosition(sf::Vector2f( game.get_mWindow().getSize().x / 2, game.get_mWindow().getSize().y / (MAX_NUMBER_OF_ITEMS + 1 ) * 3 ) );
 
 	selectedItemIndex = 0;
 
+	game.get_mWindow().clear(sf::Color(255, 207, 97));
 }
 
 
+/***************************************************************************************/
 Menu::~Menu()
 {
 }
 
 
+/***************************************************************************************/
 void Menu::draw()
 {
 	for (int i = 0; i < MAX_NUMBER_OF_ITEMS; i++)
@@ -44,28 +48,31 @@ void Menu::draw()
 }
 
 
+/***************************************************************************************/
 void Menu::MoveUp()
 {
 	if (selectedItemIndex - 1 >= 0)
 	{
-		menu[selectedItemIndex].setFillColor(sf::Color::White);
+		menu[selectedItemIndex].setFillColor(sf::Color::Black);
 		selectedItemIndex--;
 		menu[selectedItemIndex].setFillColor(sf::Color::Red);
 	}
 }
 
 
+/***************************************************************************************/
 void Menu::MoveDown()
 {
 	if (selectedItemIndex + 1 < MAX_NUMBER_OF_ITEMS)
 	{
-		menu[selectedItemIndex].setFillColor(sf::Color::White);
+		menu[selectedItemIndex].setFillColor(sf::Color::Black);
 		selectedItemIndex++;
 		menu[selectedItemIndex].setFillColor(sf::Color::Red);
 	}
 }
 
 
+/***************************************************************************************/
 void Menu::switchCaseMenu()
 {
 	while (game.get_mWindow().isOpen())
@@ -111,6 +118,7 @@ void Menu::switchCaseMenu()
 }
 
 
+/***************************************************************************************/
 void Menu::Run()
 {
 
@@ -123,9 +131,10 @@ void Menu::Run()
 }
 
 
+/***************************************************************************************/
 void Menu::Display()
 {
-	game.get_mWindow().clear();
+	game.get_mWindow().clear(sf::Color(255, 207, 97));
 
 	draw();
 
