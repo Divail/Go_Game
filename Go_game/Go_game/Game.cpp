@@ -252,23 +252,25 @@ void Game::MousePressEvent()
 
 
 				// SEND TO ENGINE and GET HIS MOVE:
-				std::string ret = getNextMove( buff.str() );
+				std::string ret = getNextMove(buff.str());
 
 
 				//
 				// EXTRACT ENGINE MOVE from string:
 				//
-				char ch;
-				std::istringstream buff2( ret );
+				std::istringstream buff2(ret);
+				char ch = ix;
 				buff2 >> ch >> iy;
-				ix = ch;
 
-				if (ix >= 'J') 
+				if (ix >= 'J')
 					ix--;
 
 				ix -= 'A';
 
-				mBoard.set_board(iy - 1, ix) = WHITE;  // AI will play white stones!
+				if (mBoard.set_board( iy - 1, ix ) != BLACK && mBoard.set_board( iy - 1, ix ) != WHITE)
+					mBoard.set_board( iy - 1, ix ) = WHITE;  // AI will play white stones!
+				else
+					mBoard.set_board( iy, ix - 1 ) = WHITE;
 
 				sound.play();
 
