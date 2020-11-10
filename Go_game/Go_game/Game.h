@@ -35,7 +35,7 @@ public:
 	
 
 	// -----------------------
-	// Textures Metods:
+	// Textures Methods:
 	void					  LoadTextures();
 	void					  AddSmoothness();
 	void					  ApplyTextures();
@@ -43,32 +43,36 @@ public:
 
 
 	// -----------------------
-	// Logic Metods: 
+	// Logic Methods: 
 	void					  update();
-	void					  remove_dead_stone (int color);
-	bool					  live_check		(int color, int x, int y);
-	std::string				  getNextMove		(std::string position);
+	void					  remove_dead_stone ( int color );
+	bool					  live_check		( int color, int x, int y );
+	std::string				  getNextMove		( std::string position );
+	void					  loopEvent();
+
 
 	// -----------------------
-	// Engine Metods:
+	// Engine Methods:
 	void					  ConnectToEngine();
 	void					  CloseConnection();
 
+
 	// -----------------------
-	// Mouse Metods:
+	// Mouse Method:
 	void					  MousePressEvent();
-
-
-	void					  WindowIsOpen();
-
-	void					  Run();
-
+	
+	
+	// -----------------------
+	// Tests Method:
 	void					  Tests();
+
+	// -----------------------
+	// Start game Method:
+	void					  Run();
 
 protected:///////////////////////////////////////////////////////////////////////////////////
 	
 			// Init Data:
-
 	Board				mBoard;
 
 	const char*			path = "gnugo.exe --mode gtp";

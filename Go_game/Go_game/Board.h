@@ -17,21 +17,22 @@ public:
 
 	// -----------------------
 	// Get Methods:
-	bool&		set_visit(int x, int y) { return visit[x][y]; }
+	bool&		set_visit( int x, int y ) { return visit[x][y]; }
 
-	auto&		set_board(int x, int y) { return board[x][y]; }
+	auto&		set_board( int x, int y ) { return board[x][y]; }
 
-	const int&  get_cell()  const		{ return cell_size; }
+	const int&  get_cell()    const		  { return cell_size; }
 
 
 	// -----------------------
-	// Face Metods:
+	// Face Methods:
 	void		draw_stone();
 	void		draw_board();
 
 
-protected:
+protected:///////////////////////////////////////////////////////////////////////////////////
 
+			// Runtime Data:
 	Game& game;
 
 	int	 cell_size = 50;

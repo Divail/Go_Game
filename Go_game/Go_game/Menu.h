@@ -11,23 +11,26 @@ public:
 	Menu();
 	~Menu();
 
+	// -----------------------
+	// Get Methods:
+	int get_pressedItem() { return selectedItemIndex; }
+
+	// -----------------------
+	// Face Metods:
 	void draw();
+	void Display();
 
+
+	// -----------------------
+	// Logic Metods: 
 	void MoveUp();
-
 	void MoveDown();
-
 	void switchCaseMenu();
 
 	void Run();
 
-	void Display();
-
-	int GetPressedItem() { return selectedItemIndex; }
-
 protected:
 	Game game;
-
 	Board board;
 
 	int selectedItemIndex;
