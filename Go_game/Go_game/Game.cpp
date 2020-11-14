@@ -161,21 +161,6 @@ std::string Game::getNextMove( std::string position )
 
 	PeekNamedPipe( pipout_r, buffer, sizeof( buffer ), &read, &avaiable, NULL );
 
-A:
-	do
-	{
-		ZeroMemory( buffer, sizeof( buffer ) );
-		if ( !ReadFile( pipout_r, buffer, sizeof( buffer ), &read, NULL ) || !read )
-			break;
-
-		buffer[read] = 0;
-
-		str += ( char* )buffer;
-	} while( read >= sizeof( buffer ) );          // MAKE AS FUNCTION
-
-	if( str.length() <= 5 )
-		goto A;
-
 	std::cout << "\n" << str;
 
 	int n = str.rfind( "=" );
