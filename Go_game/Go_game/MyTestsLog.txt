@@ -1,0 +1,5 @@
+===================================================
+                  New Tests
+
+DONE: Test_MyGame.cpp: Board_Move: 14 board.set_board(0, 0) == BLACK
+DONE: Test_MyGame.cpp: Board_Move: 17 board.set_board(0, 1) == WHITE
